@@ -28,17 +28,22 @@ The repository for storing conversations has already been created at:
 
 Your site will be available at: `https://[your-username].github.io/[repo-name]/`
 
-### 3. Configure API Keys (Administrator Only)
+### 3. Deploy Backend to Vercel (One-time setup)
 
-Since API keys cannot be stored directly in the code, you need to configure them in the browser:
+To keep your API keys secure and allow team access without sharing keys:
 
-1. Navigate to `https://[your-site]/setup.html`
-2. Enter your OpenRouter API key and GitHub token
-3. Click "Save Configuration"
+1. See `VERCEL_SETUP.md` for detailed instructions
+2. This takes about 5 minutes and is free
+3. Your team only needs the password, not API keys!
 
-The keys are stored in the browser's localStorage. Each device needs this one-time setup.
+### 4. Update Frontend Configuration
 
-### 4. Access the Platform
+After Vercel deployment, update `app.js` with your Vercel URL:
+```javascript
+apiBaseUrl: 'https://YOUR-PROJECT.vercel.app/api'
+```
+
+### 5. Access the Platform
 
 1. Navigate to your GitHub Pages URL (main index.html, not setup.html)
 2. Enter password: `ProjectPhilo`

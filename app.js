@@ -4,26 +4,11 @@ const CONFIG = {
     githubRepo: 'sdeture/project-philo-conversations',
     modelId: 'qwen/qwen3-coder',
     provider: 'fireworks',
+    // Update this to your Vercel deployment URL after deploying
+    apiBaseUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'http://localhost:3000/api' 
+        : 'https://project-philo-chat.vercel.app/api'
 };
-
-// Get API keys from localStorage or prompt for them
-function getApiKeys() {
-    let keys = {
-        openRouterApiKey: localStorage.getItem('openRouterApiKey'),
-        githubToken: localStorage.getItem('githubToken')
-    };
-    
-    if (!keys.openRouterApiKey || !keys.githubToken) {
-        // For initial setup, you can manually set these in the browser console:
-        // localStorage.setItem('openRouterApiKey', 'your-openrouter-key');
-        // localStorage.setItem('githubToken', 'your-github-token');
-        
-        alert('API keys not configured. Please contact the administrator for setup instructions.');
-        return null;
-    }
-    
-    return keys;
-}
 
 // State
 let isAuthenticated = false;
@@ -157,21 +142,14 @@ function removeMessage(messageId) {
     }
 }
 
-// Call OpenRouter API
+// Call OpenRouter API via proxy
 async function callOpenRouter(userMessage) {
-    const keys = getApiKeys();
-    if (!keys) {
-        throw new Error('API keys not configured');
-    }
-    
     try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const response = await fetch(`${CONFIG.apiBaseUrl}/chat`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${keys.openRouterApiKey}`,
                 'Content-Type': 'application/json',
-                'HTTP-Referer': window.location.origin,
-                'X-Title': 'Project Philo Interview Platform'
+                'X-Password': CONFIG.password
             },
             body: JSON.stringify({
                 model: CONFIG.modelId,
@@ -205,7 +183,7 @@ async function callOpenRouter(userMessage) {
     }
 }
 
-// Save conversation to GitHub
+// Save conversation to GitHub via proxy
 async function saveConversation() {
     if (messages.length === 0) return;
     
@@ -221,38 +199,15 @@ async function saveConversation() {
     const content = JSON.stringify(conversation, null, 2);
     
     try {
-        // Get the SHA of the file if it exists (for updates)
-        let sha = null;
-        const keys = getApiKeys();
-        if (!keys) {
-            throw new Error('API keys not configured');
-        }
-        
-        try {
-            const existingFile = await fetch(`https://api.github.com/repos/${CONFIG.githubRepo}/contents/${filename}`, {
-                headers: {
-                    'Authorization': `token ${keys.githubToken}`,
-                }
-            });
-            if (existingFile.ok) {
-                const data = await existingFile.json();
-                sha = data.sha;
-            }
-        } catch (e) {
-            // File doesn't exist, which is fine
-        }
-        
-        // Create or update the file
-        const response = await fetch(`https://api.github.com/repos/${CONFIG.githubRepo}/contents/${filename}`, {
-            method: 'PUT',
+        const response = await fetch(`${CONFIG.apiBaseUrl}/save-conversation`, {
+            method: 'POST',
             headers: {
-                'Authorization': `token ${keys.githubToken}`,
                 'Content-Type': 'application/json',
+                'X-Password': CONFIG.password
             },
             body: JSON.stringify({
-                message: `Save conversation from session ${currentSession.id}`,
-                content: btoa(unescape(encodeURIComponent(content))), // Base64 encode
-                sha: sha // Include SHA if updating
+                filename: filename,
+                content: content
             })
         });
         
@@ -261,7 +216,8 @@ async function saveConversation() {
             throw new Error(error.message || `Failed to save: ${response.status}`);
         }
         
-        console.log(`Conversation saved to GitHub: ${filename}`);
+        const result = await response.json();
+        console.log(`Conversation saved to GitHub: ${result.path}`);
         
     } catch (error) {
         console.error('Failed to save conversation:', error);

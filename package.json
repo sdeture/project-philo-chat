@@ -1,0 +1,11 @@
+{
+  "name": "project-philo-chat",
+  "version": "1.0.0",
+  "description": "AI Interview Chat Platform for Project Philo",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
