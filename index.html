@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Philo - AI Interview Chat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Authentication Screen -->
+    <div id="authScreen" class="screen active">
+        <div class="auth-container">
+            <h1>Project Philo</h1>
+            <p>AI Model Interview Platform</p>
+            <form id="authForm">
+                <input type="password" id="password" placeholder="Enter password" required>
+                <button type="submit">Enter</button>
+            </form>
+            <p id="authError" class="error"></p>
+        </div>
+    </div>
+
+    <!-- Chat Interface -->
+    <div id="chatScreen" class="screen">
+        <div class="chat-container">
+            <header class="chat-header">
+                <h2>AI Interview Session</h2>
+                <div class="session-info">
+                    <span id="modelName">Model: Loading...</span>
+                    <button id="newSession" class="btn-secondary">New Session</button>
+                    <button id="logout" class="btn-secondary">Logout</button>
+                </div>
+            </header>
+            
+            <div id="chatMessages" class="chat-messages">
+                <!-- Messages will be added here dynamically -->
+            </div>
+            
+            <form id="chatForm" class="chat-input-form">
+                <textarea id="messageInput" placeholder="Type your message..." rows="3"></textarea>
+                <button type="submit" id="sendButton">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
